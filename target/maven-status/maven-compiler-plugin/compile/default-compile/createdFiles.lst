@@ -1,0 +1,15 @@
+PBD.class
+Frontera.class
+HeuristicasPBD.class
+Heuristicas.class
+LoopoverApp.class
+Nodo.class
+ComandoVerificar.class
+HeuristicasPBD$Tipo.class
+Estado.class
+Busqueda$Estrategia.class
+ComandoBusqueda$Heuristica.class
+Visitados.class
+ComandoBusqueda.class
+Sucesor.class
+Busqueda.class
