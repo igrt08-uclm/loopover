@@ -93,6 +93,11 @@ public final class Estado {
                     throw new IllegalArgumentException("All characters in the representation must be digits.");
                 } else {
                     fichas[i >> 1] = (d - '0') * 10 + (u - '0');
+                    
+                    if (fichas[i >> 1] < 0 || fichas[i >> 1] >= NUM_CASILLAS) {
+                        throw new IllegalArgumentException(String.format("Token numbers must be in [0, %d]", NUM_CASILLAS-1));
+                    }
+
                     this.bitboard[0] |= ((long) fichas[i >> 1]) << ((i >> 1) * BITS_POR_CASILLA);
                 }
             }
@@ -108,7 +113,7 @@ public final class Estado {
         if (fichas.length != 16) {
             throw new IllegalArgumentException("The array of tokens must be of length 16.");
         } else {
-            construirBitboard(fichas);
+            bitboard[0] = construirBitboard(fichas);
         }
     }
 
@@ -278,8 +283,8 @@ public final class Estado {
         int usedToken = 0;
         for (char i = 0; i < 16; i++) {
             if (fichas[i] < 0 || fichas[i] >= NUM_CASILLAS) {
-                throw new IllegalArgumentException(String.format("Token numbers must be in [0, %d)", NUM_CASILLAS));
-            } else if ((usedToken & (1 << fichas[i])) == 1) {
+                throw new IllegalArgumentException(String.format("Token numbers must be in [0, %d]", NUM_CASILLAS-1));
+            } else if ((usedToken & (1 << fichas[i])) != 0) {
                 throw new IllegalArgumentException("No repeated tokens are allowed");
             } else {
                 bitboard |= ((long) fichas[i]) << (i * BITS_POR_CASILLA);
@@ -361,14 +366,14 @@ public final class Estado {
 
     private static void comprobarCasilla(int casilla) {
         if (casilla < 0 || casilla >= NUM_CASILLAS) {
-            throw new IllegalArgumentException("Casilla fuera de rango: " + casilla);
+            throw new IllegalArgumentException("Square out of range " + casilla);
         }
     }
 
     private static void validarAccion(int accion) {
         if (accion < 0 || accion > MASCARA_CODIGO_ACCION) {
             throw new IllegalArgumentException(
-                    "La accion debe estar entre 0 y " + MASCARA_CODIGO_ACCION + ": " + accion);
+                    "Action must be between 0 and " + MASCARA_CODIGO_ACCION + ": " + accion);
         }
     }
 
