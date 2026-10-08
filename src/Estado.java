@@ -63,7 +63,7 @@ public final class Estado {
     }
 
     // TODO: Preguntar si quitar long y dejar como long a secas (array no) o dejarlo así como está.
-    private final long[] bitboard = new long[1];
+    private long bitboard;
 
     // -------------------------------------------------------------------------
     // Constructores — TODO Tarea 1
@@ -71,7 +71,7 @@ public final class Estado {
 
     /** Construye el estado directamente desde el bitboard (ya validado). */
     public Estado(long bitboard) {
-        this.bitboard[0] = bitboard;
+        this.bitboard = bitboard;
     }
 
     /**
@@ -98,7 +98,7 @@ public final class Estado {
                         throw new IllegalArgumentException(String.format("Token numbers must be in [0, %d]", NUM_CASILLAS-1));
                     }
 
-                    this.bitboard[0] |= ((long) fichas[i >> 1]) << ((i >> 1) * BITS_POR_CASILLA);
+                    this.bitboard |= ((long) fichas[i >> 1]) << ((i >> 1) * BITS_POR_CASILLA);
                 }
             }
         }
@@ -113,7 +113,7 @@ public final class Estado {
         if (fichas.length != 16) {
             throw new IllegalArgumentException("The array of tokens must be of length 16.");
         } else {
-            bitboard[0] = construirBitboard(fichas);
+            this.bitboard = construirBitboard(fichas);
         }
     }
 
@@ -124,7 +124,7 @@ public final class Estado {
     /** Devuelve el bitboard interno (necesario para la tabla de visitados). */
     public long bitboard() {
         // TODO: return bitboard
-        return bitboard[0];
+        return bitboard;
     }
 
     /**
@@ -135,7 +135,7 @@ public final class Estado {
     public int ficha(int casilla) {
         // TODO
         comprobarCasilla(casilla);
-        return (int) ((bitboard[0] >>> (casilla * BITS_POR_CASILLA)) & MASCARA_FICHA);
+        return (int) ((bitboard >>> (casilla * BITS_POR_CASILLA)) & MASCARA_FICHA);
     }
 
     /** Devuelve la ficha en la posicion (fila, columna). */
@@ -147,8 +147,8 @@ public final class Estado {
     /** Devuelve true si el bitboard es igual al estado resuelto. */
     public boolean esResuelto() {
         // TODO
-        return bitboard[0] == BITBOARD_RESUELTO;
-    }
+        return bitboard == BITBOARD_RESUELTO;
+    }   
 
     // -------------------------------------------------------------------------
     // Sucesores — TODO Tarea 1
@@ -185,7 +185,7 @@ public final class Estado {
         int f = accion & MASCARA_FILA_ACCION, c = (accion & MASCARA_COLUMNA_ACCION) >>> 2;
         boolean positivo = (accion & BIT_SIGNO_ACCION) != 0;
 
-        return new Estado(desplazarColumna(desplazarFila(this.bitboard[0], f, positivo), c, positivo));
+        return new Estado(desplazarColumna(desplazarFila(this.bitboard, f, positivo), c, positivo));
     }
 
     // -------------------------------------------------------------------------
@@ -233,7 +233,7 @@ public final class Estado {
         // TODO: comparar bitboard con instanceof Estado
         boolean isEqual = false;
         if (obj instanceof Estado e) {
-            isEqual = e.bitboard() == this.bitboard[0];
+            isEqual = e.bitboard() == this.bitboard;
         } else {
             throw new IllegalArgumentException("Obj must be of Estado type");
         }
@@ -243,7 +243,7 @@ public final class Estado {
 
     @Override
     public int hashCode() {
-        return Long.hashCode(bitboard[0]);
+        return Long.hashCode(bitboard);
     }
 
     /**
