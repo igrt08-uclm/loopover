@@ -14,7 +14,6 @@ import java.util.List;
  * Con '+' la fila se desplaza a la derecha y la columna hacia abajo; con '-',
  * hacia la izquierda y hacia arriba.
  *
- * TODO Tarea 1: implementar todos los metodos marcados con TODO.
  */
 public final class Estado {
 
@@ -62,16 +61,17 @@ public final class Estado {
         }
     }
 
-    // TODO: Preguntar si quitar long y dejar como long a secas (array no) o dejarlo así como está.
     private long bitboard;
-
-    // -------------------------------------------------------------------------
-    // Constructores — TODO Tarea 1
-    // -------------------------------------------------------------------------
 
     /** Construye el estado directamente desde el bitboard (ya validado). */
     public Estado(long bitboard) {
-        this.bitboard = bitboard;
+        int[] fichas = new int[NUM_CASILLAS];
+
+        for (char i = 0; i < NUM_CASILLAS; i++) {
+            fichas[i] = (int) (bitboard & (0x11 << i));
+        }
+
+        this.bitboard = construirBitboard(fichas);
     }
 
     /**
@@ -80,7 +80,6 @@ public final class Estado {
      * Ejemplo: "00010203040506070809101112131415" es el estado resuelto.
      */
     public Estado(String representacion) {
-        // TODO: validar longitud, parsear 16 pares de digitos, llamar a construirBitboard
         if (representacion.length() != 32) {
             throw new IllegalArgumentException("Representation must be of length 32. 2 digits per position.");
         } else {
@@ -93,14 +92,10 @@ public final class Estado {
                     throw new IllegalArgumentException("All characters in the representation must be digits.");
                 } else {
                     fichas[i >> 1] = (d - '0') * 10 + (u - '0');
-                    
-                    if (fichas[i >> 1] < 0 || fichas[i >> 1] >= NUM_CASILLAS) {
-                        throw new IllegalArgumentException(String.format("Token numbers must be in [0, %d]", NUM_CASILLAS-1));
-                    }
-
-                    this.bitboard |= ((long) fichas[i >> 1]) << ((i >> 1) * BITS_POR_CASILLA);
                 }
             }
+
+            this.bitboard = construirBitboard(fichas);
         }
     }
 
@@ -109,7 +104,6 @@ public final class Estado {
      * ficha en la casilla i.
      */
     public Estado(int[] fichas) {
-        // TODO: validar longitud, llamar a construirBitboard
         if (fichas.length != 16) {
             throw new IllegalArgumentException("The array of tokens must be of length 16.");
         } else {
@@ -118,12 +112,11 @@ public final class Estado {
     }
 
     // -------------------------------------------------------------------------
-    // Consultas — TODO Tarea 1
+    // Consultas
     // -------------------------------------------------------------------------
 
     /** Devuelve el bitboard interno (necesario para la tabla de visitados). */
     public long bitboard() {
-        // TODO: return bitboard
         return bitboard;
     }
 
@@ -133,25 +126,22 @@ public final class Estado {
      * Operacion: (bitboard >>> (i * BITS_POR_CASILLA)) & MASCARA_FICHA
      */
     public int ficha(int casilla) {
-        // TODO
         comprobarCasilla(casilla);
         return (int) ((bitboard >>> (casilla * BITS_POR_CASILLA)) & MASCARA_FICHA);
     }
 
     /** Devuelve la ficha en la posicion (fila, columna). */
     public int ficha(int fila, int columna) {
-        // TODO: delegar a ficha(fila * LADO + columna)
         return ficha(fila * LADO + columna);
     }
 
     /** Devuelve true si el bitboard es igual al estado resuelto. */
     public boolean esResuelto() {
-        // TODO
         return bitboard == BITBOARD_RESUELTO;
     }   
 
     // -------------------------------------------------------------------------
-    // Sucesores — TODO Tarea 1
+    // Sucesores 
     // -------------------------------------------------------------------------
 
     /**
@@ -159,7 +149,6 @@ public final class Estado {
      * Cada sucesor tiene: la accion aplicada, el estado resultante y costo 1.0f.
      */
     public List<Sucesor> sucesores() {
-        // TODO: iterar ACCIONES[], crear new Sucesor(accion, aplicar(accion), 1.0f)
         List<Sucesor> succ = new ArrayList<>();
         for (char i = 0; i < NUM_ACCIONES; i++) {
             succ.add(new Sucesor(ACCIONES[i], aplicar(ACCIONES[i]), 1.0f));
@@ -169,7 +158,7 @@ public final class Estado {
     }
 
     // -------------------------------------------------------------------------
-    // Aplicar acciones — TODO Tarea 1
+    // Aplicar acciones
     // -------------------------------------------------------------------------
 
     /**
@@ -180,7 +169,6 @@ public final class Estado {
      * 4. desplazarColumna(resultado_anterior, columna, positivo)
      */
     public Estado aplicar(int accion) {
-        // TODO
         validarAccion(accion);
         int f = accion & MASCARA_FILA_ACCION, c = (accion & MASCARA_COLUMNA_ACCION) >>> 2;
         boolean positivo = (accion & BIT_SIGNO_ACCION) != 0;
@@ -189,7 +177,7 @@ public final class Estado {
     }
 
     // -------------------------------------------------------------------------
-    // Utilidades de acciones — TODO Tarea 1
+    // Utilidades de acciones
     // -------------------------------------------------------------------------
 
     /**
@@ -206,7 +194,6 @@ public final class Estado {
      *          segundo = digito columna 0-3, tercero = '+' o '-'.
      */
     public static int accionDesde(String representacion) {
-        // TODO
         int accion = 0;
 
         if (representacion.length() != 3) {
@@ -225,12 +212,11 @@ public final class Estado {
     }
 
     // -------------------------------------------------------------------------
-    // equals, hashCode, toString — TODO Tarea 1
+    // equals, hashCode, toString
     // -------------------------------------------------------------------------
 
     @Override
     public boolean equals(Object obj) {
-        // TODO: comparar bitboard con instanceof Estado
         boolean isEqual = false;
         if (obj instanceof Estado e) {
             isEqual = e.bitboard() == this.bitboard;
@@ -253,7 +239,6 @@ public final class Estado {
      */
     @Override
     public String toString() {
-        // TODO: StringBuilder, para cada casilla i → ficha(i) con cero inicial si < 10
         StringBuilder sb = new StringBuilder();
         for (char i = 0; i < NUM_CASILLAS; i++) {
             int f = ficha(i);
@@ -269,7 +254,7 @@ public final class Estado {
     }
 
     // =========================================================================
-    // Metodos privados de ayuda — TODO Tarea 1
+    // Metodos privados de ayuda
     // =========================================================================
 
     /**
@@ -278,10 +263,9 @@ public final class Estado {
      * Validar: sin duplicados, cada ficha en [0, NUM_CASILLAS).
      */
     private static long construirBitboard(int[] fichas) {
-        // TODO
         long bitboard = 0;
         int usedToken = 0;
-        for (char i = 0; i < 16; i++) {
+        for (char i = 0; i < NUM_CASILLAS; i++) {
             if (fichas[i] < 0 || fichas[i] >= NUM_CASILLAS) {
                 throw new IllegalArgumentException(String.format("Token numbers must be in [0, %d]", NUM_CASILLAS-1));
             } else if ((usedToken & (1 << fichas[i])) != 0) {
@@ -312,7 +296,6 @@ public final class Estado {
      *   rotada = ((extraida >>> 4) & mascaraFila) | ((extraida << 12) & mascaraTope)
      */
     private static long desplazarFila(long bitboard, int fila, boolean positivo) {
-        // TODO
         long rotada;
         long mascaraFila = MASCARA_FILA_TABLERO << (fila * BITS_POR_FILA_TABLERO);
         long  mascaraRetorno = MASCARA_FICHA << (fila * BITS_POR_FILA_TABLERO);
@@ -346,7 +329,6 @@ public final class Estado {
      *   rotada = ((extraida >>> 16) & mascaraColumna) | ((extraida << 48) & mascaraSuperior)
      */
     private static long desplazarColumna(long bitboard, int columna, boolean positivo) {
-        // TODO
         long rotada;
         long mascaraColumna = MASCARA_COLUMNA_TABLERO << (columna * BITS_POR_CASILLA);
         long mascaraRetorno = MASCARA_FICHA << (columna * BITS_POR_CASILLA);
