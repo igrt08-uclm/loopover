@@ -82,21 +82,17 @@ public final class Estado {
     public Estado(String representacion) {
         if (representacion.length() != 32) {
             throw new IllegalArgumentException("Representation must be of length 32. 2 digits per position.");
-        } else {
-            int[] fichas = new int[NUM_CASILLAS];
-            for (short i = 0; i < 2*NUM_CASILLAS; i += 2) {
-                char d = representacion.charAt(i);
-                char u = representacion.charAt(i+1);
-
-                if (!esDigito(u) || !esDigito(d)) {
-                    throw new IllegalArgumentException("All characters in the representation must be digits.");
-                } else {
-                    fichas[i >> 1] = (d - '0') * 10 + (u - '0');
-                }
-            }
-
-            this.bitboard = construirBitboard(fichas);
         }
+        int[] fichas = new int[NUM_CASILLAS];
+        for (int i = 0; i < NUM_CASILLAS; i++) {
+            char d = representacion.charAt(2 * i);
+            char u = representacion.charAt(2 * i + 1);
+            if (!esDigito(d) || !esDigito(u)) {
+                throw new IllegalArgumentException("All characters in the representation must be digits.");
+            }
+            fichas[i] = (d - '0') * 10 + (u - '0');
+        }
+        this.bitboard = construirBitboard(fichas);
     }
 
     /**
@@ -130,11 +126,12 @@ public final class Estado {
         return (int) ((bitboard >>> (casilla * BITS_POR_CASILLA)) & MASCARA_FICHA);
     }
 
-    /** Devuelve la ficha en la posicion (fila, columna). */
     public int ficha(int fila, int columna) {
+        if (fila < 0 || fila >= LADO || columna < 0 || columna >= LADO) {
+            throw new IllegalArgumentException("Position out of range: (" + fila + ", " + columna + ")");
+        }
         return ficha(fila * LADO + columna);
     }
-
     /** Devuelve true si el bitboard es igual al estado resuelto. */
     public boolean esResuelto() {
         return bitboard == BITBOARD_RESUELTO;
@@ -185,7 +182,9 @@ public final class Estado {
      * Formato: digito_fila + digito_columna + signo.
      */
     public static String accionComoTexto(int accion) {
-        return (accion & MASCARA_FILA_ACCION) + "" + ((accion & MASCARA_COLUMNA_ACCION) >>> 2) + "" + ((accion & BIT_SIGNO_ACCION) != 0 ? '+' : '-');
+        validarAccion(accion);
+        return (accion & MASCARA_FILA_ACCION) + "" + ((accion & MASCARA_COLUMNA_ACCION) >>> 2)
+            + "" + ((accion & BIT_SIGNO_ACCION) != 0 ? '+' : '-');
     }
 
     /**
@@ -217,14 +216,7 @@ public final class Estado {
 
     @Override
     public boolean equals(Object obj) {
-        boolean isEqual = false;
-        if (obj instanceof Estado e) {
-            isEqual = e.bitboard() == this.bitboard;
-        } else {
-            throw new IllegalArgumentException("Obj must be of Estado type");
-        }
-
-        return isEqual;
+        return obj instanceof Estado e && e.bitboard == this.bitboard;
     }
 
     @Override
