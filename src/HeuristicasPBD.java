@@ -1,5 +1,5 @@
 import java.io.IOException;
-import java.util.function.ToIntFunction;
+import java.util.function.LongToIntFunction;
 
 /** Heuristicas basadas en PBD de 8 piezas. TODO: implementar en Tarea 3. */
 public final class HeuristicasPBD {
@@ -13,7 +13,7 @@ public final class HeuristicasPBD {
         throw new UnsupportedOperationException("TODO: Tarea 3");
     }
 
-    public ToIntFunction<Estado> funcion(Tipo tipo) { throw new UnsupportedOperationException("TODO: Tarea 3"); }
+    public LongToIntFunction funcion(Tipo tipo) { throw new UnsupportedOperationException("TODO: Tarea 3"); }
     public int valorPares(Estado estado)  { throw new UnsupportedOperationException("TODO: Tarea 3"); }
     public int valorImpares(Estado estado){ throw new UnsupportedOperationException("TODO: Tarea 3"); }
     public int valorMaximo(Estado estado) { throw new UnsupportedOperationException("TODO: Tarea 3"); }

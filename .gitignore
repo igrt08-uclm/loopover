@@ -1,4 +1,4 @@
 doc/*
 target
-src/test/*
+/src/test/
 dependency-reduced-pom.xml

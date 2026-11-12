@@ -1,5 +1,5 @@
 import java.util.concurrent.Callable;
-import java.util.function.ToIntFunction;
+import java.util.function.LongToIntFunction;
 
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
@@ -25,7 +25,7 @@ public class ComandoBusqueda implements Callable<Integer> {
     @Option(names = {"-c", "--capacidad"}, description = "Numero maximo de nodos del arbol en memoria (SMA*). Obligatorio para A_ESTRELLA_ACOTADA.")
     private Integer capacidad;
     @Option(names = {"-h", "--heuristica"},
-            description = "Heurística para A_ESTRELLA: MANHATTAN (toroidal, por defecto), CERO, PARES_8, IMPARES_8, PBD_8 (maximo de pares e impares), PBD_8_SUMA (admisible falso, no garantiza óptimo), MANHATTAN_ADMISIBLE o PERMUTACIONES. Con CERO la búsqueda explora en anchura; usa -m o -c para limitarla.")
+            description = "Heurística para A_ESTRELLA: MANHATTAN (toroidal, por defecto, no admisible), CERO, MANHATTAN_ADMISIBLE, PARES_8, IMPARES_8 y PBD_8 (admisibles), PBD_8_SUMA (no admisible) y PERMUTACIONES (no admisible: su componente de orden puede sobreestimar, no garantiza óptimo). Con CERO la búsqueda explora en anchura; usa -m o -c para limitarla.")
     private Heuristica elegida = Heuristica.MANHATTAN;
 
     @Option(names = {"-m", "--max-visitados"},
@@ -66,7 +66,7 @@ public class ComandoBusqueda implements Callable<Integer> {
                 throw new IllegalArgumentException(
                         "A* acotada requiere indicar el maximo de nodos del arbol con -c");
             }
-            ToIntFunction<Estado> heuristica = resolverHeuristica(elegida);
+            LongToIntFunction heuristica = resolverHeuristica(elegida);
             busqueda = new Busqueda(actual, estrategia, profundidadMaxima,
                     capacidad != null ? capacidad : 10_000_000, heuristica, maxVisitados);
         } catch (IllegalArgumentException | java.io.IOException e) {
@@ -99,13 +99,13 @@ public class ComandoBusqueda implements Callable<Integer> {
         return CommandLine.ExitCode.OK;
     }
 
-    private static ToIntFunction<Estado> resolverHeuristica(Heuristica elegida)
+    private static LongToIntFunction resolverHeuristica(Heuristica elegida)
             throws java.io.IOException {
         switch (elegida) {
             case MANHATTAN:
                 return Heuristicas::heuristicaManhattanToroidal;
             case CERO:
-                return estado -> 0;
+                return bitboard -> 0;
             case MANHATTAN_ADMISIBLE:
                 return Heuristicas::heuristicaManhattanAdmisible;
             case PERMUTACIONES:

@@ -6,9 +6,9 @@ public final class Sucesor {
 
     private final int accion;
     private final Estado estado;
-    private final float costo;
+    private final int costo;
 
-    public Sucesor(int accion, Estado estado, float costo) {
+    public Sucesor(int accion, Estado estado, int costo) {
         this.accion = accion;
         this.estado = estado;
         this.costo = costo;
@@ -22,7 +22,7 @@ public final class Sucesor {
         return estado;
     }
 
-    public float costo() {
+    public int costo() {
         return costo;
     }
 

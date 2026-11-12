@@ -1,5 +1,4 @@
 import java.util.concurrent.Callable;
-
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
@@ -16,14 +15,12 @@ public class LoopoverApp implements Callable<Integer> {
     @Option(names = {"-v", "--verbose"}, description = "Muestra información detallada durante la búsqueda.")
     private boolean verbose;
 
-
     @Override
     public Integer call() {
         System.out.println("Hola, mundo desde Loopover!");
         if (verbose) {
             System.out.println("Modo verbose activado.");
         }
-
         return CommandLine.ExitCode.OK;
     }
 

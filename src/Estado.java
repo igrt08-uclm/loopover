@@ -61,16 +61,14 @@ public final class Estado {
         }
     }
 
-    private long bitboard;
+    private final long bitboard;
 
     /** Construye el estado directamente desde el bitboard (ya validado). */
     public Estado(long bitboard) {
         int[] fichas = new int[NUM_CASILLAS];
-
-        for (char i = 0; i < NUM_CASILLAS; i++) {
-            fichas[i] = (int) (bitboard & (0x11 << i));
+        for (int i = 0; i < NUM_CASILLAS; i++) {
+            fichas[i] = (int) ((bitboard >>> (i * BITS_POR_CASILLA)) & MASCARA_FICHA);
         }
-
         this.bitboard = construirBitboard(fichas);
     }
 
@@ -148,7 +146,7 @@ public final class Estado {
     public List<Sucesor> sucesores() {
         List<Sucesor> succ = new ArrayList<>();
         for (char i = 0; i < NUM_ACCIONES; i++) {
-            succ.add(new Sucesor(ACCIONES[i], aplicar(ACCIONES[i]), 1.0f));
+            succ.add(new Sucesor(ACCIONES[i], aplicar(ACCIONES[i]), 1));
         }
 
         return succ;
